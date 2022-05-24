@@ -52,7 +52,7 @@ func TestMyExampleComponent(t *testing.T) {
 	require.NoError(t, err)
 
 	// running collector subprocess that uses the provided config set to export OTLP to our test receiver
-	myCollector, err := testutils.NewCollectorProcess().WithConfigPath(path.Join(".", "testdata", "config.yaml")).Build()
+	myCollector, err := testutils.NewCollectorProcess().WithConfigPaths([]string{path.Join(".", "testdata", "config.yaml")}).Build()
 	require.NoError(t, err)
 	err = myCollector.Start()
 	require.NoError(t, err)

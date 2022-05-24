@@ -29,7 +29,7 @@ func TestCollectorProcessBuilders(t *testing.T) {
 	require.NotNil(t, builder)
 
 	assert.Empty(t, builder.Path)
-	assert.Empty(t, builder.ConfigPath)
+	assert.Empty(t, builder.ConfigPaths)
 	assert.Nil(t, builder.Args)
 	assert.Nil(t, builder.Logger)
 	assert.Empty(t, builder.LogLevel)
@@ -38,10 +38,10 @@ func TestCollectorProcessBuilders(t *testing.T) {
 	assert.Equal(t, "somepath", withPath.Path)
 	assert.Empty(t, builder.Path)
 
-	withConfigPath, ok := builder.WithConfigPath("someconfigpath").(*CollectorProcess)
+	withConfigPath, ok := builder.WithConfigPaths([]string{"someconfigpath"}).(*CollectorProcess)
 	require.True(t, ok)
-	assert.Equal(t, "someconfigpath", withConfigPath.ConfigPath)
-	assert.Empty(t, builder.ConfigPath)
+	assert.Equal(t, "someconfigpath", withConfigPath.ConfigPaths)
+	assert.Empty(t, builder.ConfigPaths)
 
 	withArgs, ok := builder.WithArgs("arg_one", "arg_two", "arg_three").(*CollectorProcess)
 	require.True(t, ok)
@@ -66,7 +66,7 @@ func TestConfigPathRequiredUponBuildWithoutArgs(t *testing.T) {
 	collector, err := builder.Build()
 	assert.Nil(t, collector)
 	require.Error(t, err)
-	assert.EqualError(t, err, "you must specify a ConfigPath for your CollectorProcess before building")
+	assert.EqualError(t, err, "you must specify a ConfigPaths for your CollectorProcess before building")
 }
 
 func TestConfigPathNotRequiredUponBuildWithArgs(t *testing.T) {
@@ -79,7 +79,7 @@ func TestConfigPathNotRequiredUponBuildWithArgs(t *testing.T) {
 
 func TestCollectorProcessBuildDefaults(t *testing.T) {
 	// specifying Path to avoid built otelcol requirement
-	builder := NewCollectorProcess().WithPath("somepath").WithConfigPath("someconfigpath")
+	builder := NewCollectorProcess().WithPath("somepath").WithConfigPaths([]string{"someconfigpath"})
 
 	c, err := builder.Build()
 	require.NoError(t, err)
@@ -89,7 +89,7 @@ func TestCollectorProcessBuildDefaults(t *testing.T) {
 	require.True(t, ok)
 
 	assert.Equal(t, "somepath", collector.Path)
-	assert.Equal(t, "someconfigpath", collector.ConfigPath)
+	assert.Equal(t, "someconfigpath", collector.ConfigPaths[0])
 	assert.NotNil(t, collector.Logger)
 	assert.Equal(t, "info", collector.LogLevel)
 	assert.Equal(t, []string{"--set=service.telemetry.logs.level=info", "--config", "someconfigpath", "--metrics-level", "none"}, collector.Args)
@@ -110,7 +110,7 @@ func TestStartAndShutdownInvalidWithoutBuilding(t *testing.T) {
 func TestCollectorProcessWithInvalidPaths(t *testing.T) {
 	logCore, logObserver := observer.New(zap.DebugLevel)
 	logger := zap.New(logCore)
-	collector, err := NewCollectorProcess().WithPath("nototel").WithConfigPath("notaconfig").WithLogger(logger).Build()
+	collector, err := NewCollectorProcess().WithPath("nototel").WithConfigPaths([]string{"notaconfig"}).WithLogger(logger).Build()
 	require.NotNil(t, collector)
 	require.NoError(t, err)
 

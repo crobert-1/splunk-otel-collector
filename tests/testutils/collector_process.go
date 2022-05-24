@@ -31,9 +31,9 @@ const findExecutableErrorMsg = "unable to find collector executable path.  Be su
 var _ Collector = (*CollectorProcess)(nil)
 
 type CollectorProcess struct {
-	Path             string
-	ConfigPath       string
-	Args             []string
+	Path        string
+	ConfigPaths []string
+	Args        []string
 	Env              map[string]string
 	Logger           *zap.Logger
 	LogLevel         string
@@ -54,12 +54,12 @@ func (collector CollectorProcess) WithPath(path string) CollectorProcess {
 }
 
 // Required
-func (collector CollectorProcess) WithConfigPath(path string) Collector {
-	collector.ConfigPath = path
+func (collector CollectorProcess) WithConfigPaths(paths []string) Collector {
+	collector.ConfigPaths = paths
 	return &collector
 }
 
-// []string{"--set=service.telemetry.logs.level={collector.LogLevel}", "--config", collector.ConfigPath, "--metrics-level", "none"} by default
+// []string{"--set=service.telemetry.logs.level={collector.LogLevel}", "--config", collector.ConfigPaths, "--metrics-level", "none"} by default
 func (collector CollectorProcess) WithArgs(args ...string) Collector {
 	collector.Args = args
 	return &collector
@@ -92,8 +92,8 @@ func (collector CollectorProcess) WillFail(fail bool) Collector {
 }
 
 func (collector CollectorProcess) Build() (Collector, error) {
-	if collector.ConfigPath == "" && collector.Args == nil {
-		return nil, fmt.Errorf("you must specify a ConfigPath for your CollectorProcess before building")
+	if len(collector.ConfigPaths) == 0 && collector.Args == nil {
+		return nil, fmt.Errorf("you must specify a ConfigPaths for your CollectorProcess before building")
 	}
 	if collector.Path == "" {
 		collectorPath, err := findCollectorPath()
@@ -110,7 +110,12 @@ func (collector CollectorProcess) Build() (Collector, error) {
 	}
 	if collector.Args == nil {
 		collector.Args = []string{
-			fmt.Sprintf("--set=service.telemetry.logs.level=%s", collector.LogLevel), "--config", collector.ConfigPath, "--metrics-level", "none",
+			fmt.Sprintf("--set=service.telemetry.logs.level=%s", collector.LogLevel), "--metrics-level", "none",
+		}
+
+		for _, configPath := range collector.ConfigPaths {
+			collector.Args = append(collector.Args, "--config")
+			collector.Args = append(collector.Args, configPath)
 		}
 	}
 

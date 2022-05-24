@@ -43,7 +43,7 @@ func TestCollectorProcessConfigSourced(t *testing.T) {
 	defer func() { require.NoError(t, otlp.Shutdown()) }()
 
 	configPath := path.Join(".", "testdata", "collector_process_config.yaml")
-	collector, err := NewCollectorProcess().WithConfigPath(configPath).Build()
+	collector, err := NewCollectorProcess().WithConfigPaths([]string{configPath}).Build()
 	require.NoError(t, err)
 	require.NotNil(t, collector)
 

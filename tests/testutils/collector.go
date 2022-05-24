@@ -19,7 +19,7 @@ import (
 )
 
 type Collector interface {
-	WithConfigPath(path string) Collector
+	WithConfigPaths(path []string) Collector
 	WithArgs(args ...string) Collector
 	WithEnv(env map[string]string) Collector
 	WithLogger(logger *zap.Logger) Collector

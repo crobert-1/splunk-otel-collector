@@ -31,9 +31,9 @@ var _ Collector = (*CollectorContainer)(nil)
 var _ testcontainers.LogConsumer = (*collectorLogConsumer)(nil)
 
 type CollectorContainer struct {
-	Image          string
-	ConfigPath     string
-	Args           []string
+	Image       string
+	ConfigPaths []string
+	Args        []string
 	Ports          []string
 	Logger         *zap.Logger
 	LogLevel       string
@@ -60,8 +60,8 @@ func (collector CollectorContainer) WithExposedPorts(ports ...string) CollectorC
 }
 
 // Will use bundled config by default
-func (collector CollectorContainer) WithConfigPath(path string) Collector {
-	collector.ConfigPath = path
+func (collector CollectorContainer) WithConfigPaths(paths []string) Collector {
+	collector.ConfigPaths = paths
 	return &collector
 }
 

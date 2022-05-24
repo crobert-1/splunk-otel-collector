@@ -77,7 +77,7 @@ func TestSpecifiedContainerConfigDefaultsToCmdLineArgIfEnvVarConflict(t *testing
 
 	env := map[string]string{"SPLUNK_CONFIG": "/not/a/real/path"}
 	config := path.Join(".", "testdata", "logged_hostmetrics.yaml")
-	c := testutils.NewCollectorContainer().WithImage(image).WithEnv(env).WithLogger(logger).WithConfigPath(config)
+	c := testutils.NewCollectorContainer().WithImage(image).WithEnv(env).WithLogger(logger).WithConfigPaths([]string{config})
 	// specify in container path of provided config via cli.
 	collector, err := c.WithArgs("--config", "/etc/config.yaml").Build()
 	require.NoError(t, err)
@@ -146,6 +146,50 @@ service:
 			if strings.Contains(
 				log.Message,
 				`Using environment variable SPLUNK_CONFIG_YAML for configuration`,
+			) {
+				return true
+			}
+		}
+		return false
+	}, 20*time.Second, time.Second)
+
+	require.Eventually(t, func() bool {
+		for _, log := range logs.All() {
+			// logged host metric to confirm basic functionality
+			if strings.Contains(log.Message, "Value: ") {
+				return true
+			}
+		}
+		return false
+	}, 5*time.Second, time.Second)
+}
+
+func TestMultipleConfigFlags(t *testing.T) {
+	image := (&testutils.Testcase{T: t}).SkipIfNotContainer()
+
+	logCore, logs := observer.New(zap.DebugLevel)
+	logger := zap.New(logCore)
+
+	collector, err := testutils.NewCollectorContainer().
+		WithImage(image).
+		WithConfigPaths([]string{
+			path.Join(".", "testdata", "receivers.yaml"),
+			path.Join(".", "testdata", "processors.yaml"),
+			path.Join(".", "testdata", "exporters.yaml"),
+			path.Join(".", "testdata", "services.yaml")}).
+		WithLogger(logger).
+		Build()
+
+	require.NoError(t, err)
+	require.NotNil(t, collector)
+	require.NoError(t, collector.Start())
+	defer func() { require.NoError(t, collector.Shutdown()) }()
+
+	require.Eventually(t, func() bool {
+		for _, log := range logs.All() {
+			if strings.Contains(
+				log.Message,
+				`Set config to [/etc/config0.yaml,/etc/config1.yaml,/etc/config2.yaml,/etc/config3.yaml]`,
 			) {
 				return true
 			}

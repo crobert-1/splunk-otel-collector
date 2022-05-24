@@ -129,7 +129,7 @@ specified config.
 import "github.com/signafx/splunk-otel-collector/tests/testutils"
 
 collector, err := testutils.NewCollectorProcess().WithPath("my_otel_collector_path",
-).WithConfigPath("my_config_path").WithLogger(logger).WithLogLevel("debug").Build()
+).WithConfigPaths([]string{"my_config_path"}).WithLogger(logger).WithLogLevel("debug").Build()
 
 err = collector.Start()
 require.NoError(t, err)
@@ -150,7 +150,7 @@ of `"quay.io/signalfx/splunk-otel-collector-dev:latest"`.
 import "github.com/signafx/splunk-otel-collector/tests/testutils"
 
 collector, err := testutils.NewCollectorContainer().WithImage("quay.io/signalfx/splunk-otel-collector:latest",
-).WithConfigPath("my_config_path").Build()
+).WithConfigPaths([]string{"my_config_path"}).Build()
 
 err = collector.Start()
 require.NoError(t, err)

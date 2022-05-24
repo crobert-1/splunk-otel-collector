@@ -27,16 +27,16 @@ func TestCollectorContainerBuilders(t *testing.T) {
 	require.NotNil(t, builder)
 
 	assert.Empty(t, builder.Image)
-	assert.Empty(t, builder.ConfigPath)
+	assert.Empty(t, builder.ConfigPaths)
 
 	withImage := builder.WithImage("someimage")
 	assert.Equal(t, "someimage", withImage.Image)
 	assert.Empty(t, builder.Image)
 
-	withConfigPath, ok := builder.WithConfigPath("someconfigpath").(*CollectorContainer)
+	withConfigPath, ok := builder.WithConfigPaths([]string{"someconfigpath"}).(*CollectorContainer)
 	require.True(t, ok)
-	assert.Equal(t, "someconfigpath", withConfigPath.ConfigPath)
-	assert.Empty(t, builder.ConfigPath)
+	assert.Equal(t, "someconfigpath", withConfigPath.ConfigPaths[0])
+	assert.Empty(t, builder.ConfigPaths)
 
 	withArgs, ok := builder.WithArgs("arg_one", "arg_two", "arg_three").(*CollectorContainer)
 	require.True(t, ok)
@@ -84,7 +84,7 @@ func TestCollectorContainerBuildDefaults(t *testing.T) {
 	require.True(t, ok)
 
 	assert.Equal(t, "quay.io/signalfx/splunk-otel-collector:latest", collector.Image)
-	assert.Equal(t, "", collector.ConfigPath)
+	assert.Empty(t, collector.ConfigPaths)
 	assert.NotNil(t, collector.Logger)
 	assert.Equal(t, "info", collector.LogLevel)
 	assert.Equal(t, []string{}, collector.Args)
@@ -115,7 +115,7 @@ func TestCollectorContainerWithInvalidImage(t *testing.T) {
 }
 
 func TestCollectorContainerWithInvalidConfigPath(t *testing.T) {
-	collector, err := NewCollectorContainer().WithConfigPath("notaconfig").Build()
+	collector, err := NewCollectorContainer().WithConfigPaths([]string{"notaconfig"}).Build()
 	require.Nil(t, collector)
 	require.EqualError(t, err, "open notaconfig: no such file or directory")
 }
@@ -131,7 +131,7 @@ func TestCollectorContainerLogging(t *testing.T) {
 	require.True(t, ok)
 
 	assert.Equal(t, "quay.io/signalfx/splunk-otel-collector:latest", collector.Image)
-	assert.Equal(t, "", collector.ConfigPath)
+	assert.Empty(t, collector.ConfigPaths)
 	assert.NotNil(t, collector.Logger)
 	assert.Equal(t, "info", collector.LogLevel)
 	assert.Equal(t, []string{}, collector.Args)

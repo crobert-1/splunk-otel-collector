@@ -141,8 +141,8 @@ func (t *Testcase) splunkOtelCollector(configFilename string, env map[string]str
 	}
 
 	var err error
-	collector = collector.WithConfigPath(
-		path.Join(".", "testdata", configFilename),
+	collector = collector.WithConfigPaths(
+		[]string{path.Join(".", "testdata", configFilename)},
 	).WithEnv(envVars).WithLogLevel("debug").WithLogger(t.Logger)
 
 	splunkEnv := map[string]string{}
