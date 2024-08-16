@@ -2,6 +2,8 @@ module github.com/signalfx/splunk-otel-collector/internal/tools
 
 go 1.22.0
 
+toolchain go1.22.6
+
 require (
 	github.com/client9/misspell v0.3.4
 	github.com/golangci/golangci-lint v1.59.1
