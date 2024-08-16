@@ -4,6 +4,7 @@
 
 ### 🛑 Breaking changes 🛑
 
+- (Splunk/Core/Contrib) Bump minimum version to go 1.22 ([#](https://github.com/signalfx/splunk-otel-collector/pull/))
 - (Splunk) `confmap`: Do not expand special shell variable such as `$*` in configuration files. ([#5206](https://github.com/signalfx/splunk-otel-collector/pull/5206))
 
 ### 🚀 New components 🚀
