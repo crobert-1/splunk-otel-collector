@@ -41,7 +41,7 @@
 ---
 
 <!--PRODUCT_DOCS-->
-# Splunk OpenTelemetry Collector
+# IGNORE Splunk OpenTelemetry Collector
 
 Splunk OpenTelemetry Collector is a distribution of the [OpenTelemetry
 Collector](https://github.com/open-telemetry/opentelemetry-collector). It
